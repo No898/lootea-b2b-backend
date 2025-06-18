@@ -7,39 +7,187 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enum definice
+enum UserRole {
+  ADMIN
+  B2B_CUSTOMER
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum Unit {
+  KS // kusy (prodejní jednotka)
+  KG // kilogramy
+  L // litry
+  BAL // balení (1 bal = 6 ks)
+}
+
+// Uživatelé (B2B zákazníci + admin)
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
+  id       String   @id @default(uuid())
+  email    String   @unique
+  password String
+  role     UserRole @default(B2B_CUSTOMER)
+
+  // B2B informace
+  companyName String?
+  ico         String? @unique // IČO firmy
+  dic         String? // DIČ firmy
+  phone       String?
+
+  // Adresa
+  street  String?
+  city    String?
+  zipCode String?
+  country String? @default("Czech Republic")
+
+  // Status
+  isActive Boolean @default(true)
+
   createdAt DateTime @default(now())
-  orders    Order[]
+  updatedAt DateTime @updatedAt
+
+  // Vztahy
+  orders       Order[]
+  customPrices CustomPrice[]
+
+  @@map("users")
 }
 
-model Product {
-  id          String      @id @default(uuid())
-  name        String
+// Kategorie produktů
+model Category {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  slug        String  @unique
   description String?
-  price       Float
-  createdAt   DateTime    @default(now())
-  OrderItem   OrderItem[]
+  isActive    Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Vztahy
+  products Product[]
+
+  @@map("categories")
 }
 
+// Produkty
+model Product {
+  id          String  @id @default(uuid())
+  name        String
+  slug        String  @unique
+  description String?
+
+  // Ceny a jednotky
+  basePrice   Float // Základní cena
+  unit        Unit  @default(KS)
+  packageSize Int? // Kolik kusů v balení (pro BAL)
+
+  // Inventory
+  inStock Boolean @default(true)
+
+  // Kategorie
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  // Metadata
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Vztahy
+  orderItems   OrderItem[]
+  customPrices CustomPrice[]
+
+  @@map("products")
+}
+
+// Individuální ceny pro B2B zákazníky
+model CustomPrice {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  price Float // Speciální cena pro tohoto zákazníka
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@map("custom_prices")
+}
+
+// Objednávky
 model Order {
-  id        String      @id @default(uuid())
-  userId    String
-  user      User        @relation(fields: [userId], references: [id])
-  status    String
-  total     Float
-  createdAt DateTime    @default(now())
-  items     OrderItem[]
+  id          String @id @default(uuid())
+  orderNumber String @unique // Lidsky čitelné číslo objednávky
+
+  // Zákazník
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Status a ceny
+  status   OrderStatus @default(PENDING)
+  subtotal Float // Součet položek
+  shipping Float       @default(0)
+  total    Float // Subtotal + shipping
+
+  // Dodací adresa (může být jiná než u uživatele)
+  shippingStreet  String?
+  shippingCity    String?
+  shippingZipCode String?
+  shippingCountry String? @default("Czech Republic")
+
+  // Platba
+  paymentId     String? // ID z Comgate
+  paymentMethod String? // "card", "apple_pay"
+  paidAt        DateTime?
+
+  // Poznámky
+  customerNote String?
+  adminNote    String?
+
+  // Tracking
+  trackingNumber String?
+  shippedAt      DateTime?
+  deliveredAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Vztahy
+  items OrderItem[]
+
+  @@map("orders")
 }
 
+// Položky objednávky
 model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
+  id String @id @default(uuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
   productId String
   product   Product @relation(fields: [productId], references: [id])
+
   quantity  Int
-  price     Float
+  unitPrice Float // Cena za jednotku v době objednávky
+  total     Float // quantity * unitPrice
+
+  @@map("order_items")
 }

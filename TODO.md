@@ -11,8 +11,14 @@
 
 ### ✅ Hotovo
 - [x] Základní package.json s dependencies
-- [x] Základní Prisma schema
+- [x] Základní Prisma schema (rozšířené pro B2B)
 - [x] Dokumentace v Docusaurus
+- [x] TypeScript konfigurace (tsconfig.json)
+- [x] Docker Compose pro lokální development
+- [x] Prisma migrace a seed data
+- [x] Základní Fastify server v TypeScript
+- [x] Health check a DB test endpointy
+- [x] ESLint + TypeScript parser setup
 
 ### 🔄 Week 1: Railway setup a databázové modely
 
@@ -59,42 +65,43 @@
   - [ ] Database connection test
   - [ ] Environment validation test
 
-#### 📋 Rozšíření Prisma Schema (8-12 hodin)
-- [ ] **Kategorie produktů** - model Category s hierarchií
-  - [ ] Enum pro typy: SIRUPY, TOPPINGS, PRASKY_SMESI, VYBAVENI, CAJE
-  - [ ] Podpora pro subcategories (parent/children vztah)
-- [ ] **Rozšířený Product model** 
-  - [ ] Kategorie vztah (categoryId)
-  - [ ] Jednotky (unit: KS/BAL, weightPerUnit, volumePerUnit)
-  - [ ] Inventory (inStock boolean, stockQuantity)
-  - [ ] SEO fields (slug, metaDescription)
-- [ ] **B2B User model rozšíření**
-  - [ ] Role enum (CUSTOMER, ADMIN)
-  - [ ] Firemní údaje (companyName, ico, dic, address)
-  - [ ] Status (PENDING, APPROVED, BLOCKED)
-- [ ] **Individuální ceny - CustomerPrice model**
-  - [ ] Vztah User <-> Product s custom cenou
-  - [ ] Platnost ceny (validFrom, validTo)
-- [ ] **Detailní Order system**
-  - [ ] Status enum (PENDING, PAID, PROCESSING, SHIPPED, DELIVERED, CANCELLED)
-  - [ ] Shipping info (address, method, cost)
-  - [ ] Payment info (paymentId, paymentMethod, paidAt)
-- [ ] **Email templates a logs**
+#### ✅ Rozšíření Prisma Schema (8-12 hodin) - **HOTOVO**
+- [x] **Kategorie produktů** - model Category s hierarchií
+  - [x] Enum pro typy: SIRUPY, TOPPINGS, PRASKY_SMESI, VYBAVENI, CAJE
+  - [ ] Podpora pro subcategories (parent/children vztah) - zatím nepotřeba
+- [x] **Rozšířený Product model** 
+  - [x] Kategorie vztah (categoryId)
+  - [x] Jednotky (unit: KS/BAL/KG/L, packageSize)
+  - [x] Inventory (inStock boolean)
+  - [x] SEO fields (slug)
+- [x] **B2B User model rozšíření**
+  - [x] Role enum (B2B_CUSTOMER, ADMIN)
+  - [x] Firemní údaje (companyName, ico, dic, address)
+  - [x] Status (isActive) - bez schvalování
+- [x] **Individuální ceny - CustomPrice model**
+  - [x] Vztah User <-> Product s custom cenou
+  - [ ] Platnost ceny (validFrom, validTo) - zatím nepotřeba
+- [x] **Detailní Order system**
+  - [x] Status enum (PENDING, PAID, PROCESSING, SHIPPED, DELIVERED, CANCELLED)
+  - [x] Shipping info (address, method, cost)
+  - [x] Payment info (paymentId, paymentMethod, paidAt)
+- [ ] **Email templates a logs** - pro později
   - [ ] EmailTemplate model (typ, subject, body)
   - [ ] EmailLog model (tracking odeslaných emailů)
 
-#### 🗄️ Database setup na Railway (4-6 hodin)
-- [ ] **Prisma konfigurace**
-  - [ ] Database URL z Railway
-  - [ ] Prisma migrate na production databázi
-  - [ ] Seed data (kategorie, admin user, testovací produkty)
-  - [ ] Prisma Studio přístup k production DB
+#### 🔄 Database setup na Railway (4-6 hodin) - **ČÁSTEČNĚ HOTOVO**
+- [x] **Prisma konfigurace**
+  - [x] Database URL z Railway (lokálně přes Docker)
+  - [x] Prisma migrate na databázi
+  - [x] Seed data (kategorie, admin user, testovací produkty)
+  - [x] Prisma Studio přístup k databázi
+- [ ] **Railway production setup** - zatím jen lokální Docker
 
 ### 🔄 Week 2: Základní server infrastruktura
 
-#### 🚀 Fastify + Apollo Server setup (12-16 hodin)
-- [ ] **Základní server struktura**
-  - [ ] `src/index.js` - entry point s Fastify
+#### 🔄 Fastify + Apollo Server setup (12-16 hodin) - **ČÁSTEČNĚ HOTOVO**
+- [x] **Základní server struktura**
+  - [x] `src/index.ts` - entry point s Fastify (TypeScript)
   - [ ] `src/config/` - konfigurace (database, redis, jwt)
   - [ ] `src/graphql/` - Apollo Server setup
   - [ ] `src/utils/` - helper funkce
@@ -113,9 +120,9 @@
   - [ ] Redis client setup
   - [ ] Session storage
   - [ ] Cache helper funkce
-- [ ] **Health check endpoints**
-  - [ ] `/health` - základní health check
-  - [ ] `/health/db` - database connectivity
+- [x] **Health check endpoints**
+  - [x] `/health` - základní health check
+  - [x] `/db-test` - database connectivity
   - [ ] `/health/redis` - redis connectivity
 
 ---
