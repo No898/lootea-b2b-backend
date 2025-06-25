@@ -1,0 +1,53 @@
+import { Context } from '../context';
+export declare function requireAuth(context: Context): {
+    id: string;
+    email: string;
+    password: string;
+    role: import(".prisma/client").$Enums.UserRole;
+    companyName: string | null;
+    ico: string | null;
+    dic: string | null;
+    phone: string | null;
+    street: string | null;
+    city: string | null;
+    zipCode: string | null;
+    country: string | null;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+};
+export declare function requireAdmin(context: Context): Promise<{
+    id: string;
+    email: string;
+    password: string;
+    role: import(".prisma/client").$Enums.UserRole;
+    companyName: string | null;
+    ico: string | null;
+    dic: string | null;
+    phone: string | null;
+    street: string | null;
+    city: string | null;
+    zipCode: string | null;
+    country: string | null;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}>;
+export declare function requireActiveAccount(context: Context): {
+    id: string;
+    email: string;
+    password: string;
+    role: import(".prisma/client").$Enums.UserRole;
+    companyName: string | null;
+    ico: string | null;
+    dic: string | null;
+    phone: string | null;
+    street: string | null;
+    city: string | null;
+    zipCode: string | null;
+    country: string | null;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+};
+//# sourceMappingURL=auth.d.ts.map
