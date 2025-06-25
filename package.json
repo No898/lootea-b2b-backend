@@ -20,8 +20,7 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio",
-    "prepare": "husky"
+    "db:studio": "prisma studio"
   },
   "keywords": [],
   "author": "We Are Lootea s. r. o.",
@@ -52,7 +51,6 @@
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-jest": "^29.0.1",
     "graphql-request": "^7.2.0",
-    "husky": "^9.1.7",
     "jest": "^30.0.2",
     "lint-staged": "^16.1.2",
     "nodemon": "^3.1.10",
