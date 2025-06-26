@@ -97,9 +97,12 @@ const start = async (): Promise<void> => {
       throw new Error('JWT_SECRET environment variable is required');
     }
 
-    const restPort = Number(process.env.REST_PORT) || 3000;
-    const graphqlPort = Number(process.env.GRAPHQL_PORT) || 4000;
-    const host = process.env.HOST || 'localhost';
+    // Railway používá PORT proměnnou
+    const port =
+      Number(process.env.PORT) || Number(process.env.REST_PORT) || 3000;
+    const restPort = port;
+    const graphqlPort = port + 1; // GraphQL na dalším portu
+    const host = process.env.HOST || '0.0.0.0'; // Railway potřebuje 0.0.0.0
 
     // Start Fastify server pro REST endpoints
     await fastify.listen({ port: restPort, host });
