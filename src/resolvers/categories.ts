@@ -1,21 +1,7 @@
 import { Context } from '../context';
 import { GraphQLError } from 'graphql';
 import { requireAdmin } from '../utils/auth';
-
-interface CreateCategoryInput {
-  name: string;
-  slug: string;
-  description?: string;
-  sortOrder?: number;
-}
-
-interface UpdateCategoryInput {
-  name?: string;
-  slug?: string;
-  description?: string;
-  isActive?: boolean;
-  sortOrder?: number;
-}
+import { CreateCategoryInput, UpdateCategoryInput } from '../types/resolvers';
 
 export const categoryResolvers = {
   Query: {

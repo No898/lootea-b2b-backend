@@ -1,30 +1,7 @@
 import { Context } from '../context';
 import { GraphQLError } from 'graphql';
 import { requireAdmin } from '../utils/auth';
-
-interface CreateProductInput {
-  name: string;
-  slug: string;
-  description?: string;
-  basePrice: number;
-  unit: 'KS' | 'KG' | 'L' | 'BAL';
-  packageSize?: number;
-  categoryId: string;
-  sortOrder?: number;
-}
-
-interface UpdateProductInput {
-  name?: string;
-  slug?: string;
-  description?: string;
-  basePrice?: number;
-  unit?: 'KS' | 'KG' | 'L' | 'BAL';
-  packageSize?: number;
-  inStock?: boolean;
-  isActive?: boolean;
-  categoryId?: string;
-  sortOrder?: number;
-}
+import { CreateProductInput, UpdateProductInput } from '../types/resolvers';
 
 export const productResolvers = {
   Query: {

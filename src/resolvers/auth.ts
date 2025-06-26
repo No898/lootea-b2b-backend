@@ -2,24 +2,7 @@ import { Context } from '../context';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
-
-interface RegisterInput {
-  email: string;
-  password: string;
-  companyName: string;
-  ico?: string;
-  dic?: string;
-  phone?: string;
-  street?: string;
-  city?: string;
-  zipCode?: string;
-  country?: string;
-}
-
-interface LoginInput {
-  email: string;
-  password: string;
-}
+import { RegisterInput, LoginInput } from '../types/resolvers';
 
 export const authResolvers = {
   Mutation: {
