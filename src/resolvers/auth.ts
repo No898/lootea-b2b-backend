@@ -2,7 +2,7 @@ import { Context } from '../context';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
-import { RegisterInput, LoginInput } from '../types/resolvers';
+import type { RegisterInput, LoginInput } from '../types/resolvers';
 
 export const authResolvers = {
   Mutation: {

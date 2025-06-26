@@ -1,7 +1,10 @@
 import { Context } from '../context';
 import { GraphQLError } from 'graphql';
 import { requireAdmin } from '../utils/auth';
-import { CreateCategoryInput, UpdateCategoryInput } from '../types/resolvers';
+import type {
+  CreateCategoryInput,
+  UpdateCategoryInput,
+} from '../types/resolvers';
 
 export const categoryResolvers = {
   Query: {

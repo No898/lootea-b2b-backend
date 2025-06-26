@@ -55,3 +55,19 @@ export interface RegisterInput {
   zipCode?: string;
   country?: string;
 }
+
+// GraphQL Resolver Types
+export interface Resolvers {
+  Query: {
+    [key: string]: any;
+  };
+  Mutation: {
+    [key: string]: any;
+  };
+  Product?: {
+    [key: string]: any;
+  };
+  Category?: {
+    [key: string]: any;
+  };
+}

@@ -1,7 +1,10 @@
 import { Context } from '../context';
 import { GraphQLError } from 'graphql';
 import { requireAdmin } from '../utils/auth';
-import { CreateProductInput, UpdateProductInput } from '../types/resolvers';
+import type {
+  CreateProductInput,
+  UpdateProductInput,
+} from '../types/resolvers';
 
 export const productResolvers = {
   Query: {

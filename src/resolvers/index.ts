@@ -2,7 +2,7 @@ import { authResolvers } from './auth';
 import { categoryResolvers } from './categories';
 import { productResolvers } from './products';
 
-export const resolvers = {
+export const resolvers: any = {
   Query: {
     ...authResolvers.Query,
     ...categoryResolvers.Query,

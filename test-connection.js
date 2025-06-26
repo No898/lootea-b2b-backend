@@ -1,5 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const Redis = require('ioredis');
+import { PrismaClient } from '@prisma/client';
+import Redis from 'ioredis';
 
 async function testConnections() {
     console.log('🔍 Testování připojení k Railway službám...\n');
