@@ -4,9 +4,9 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import dotenv from 'dotenv';
 
-import { typeDefs } from './schema/typeDefs';
-import { resolvers } from './resolvers';
-import { createContext } from './context';
+import { typeDefs } from './schema/typeDefs.js';
+import { resolvers } from './resolvers/index.js';
+import { createContext } from './context.js';
 
 // Load environment variables
 dotenv.config();

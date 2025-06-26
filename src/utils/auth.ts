@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { Context } from '../context';
+import { Context } from '../context.js';
 import { UserRole } from '@prisma/client';
 
 export function requireAuth(context: Context) {

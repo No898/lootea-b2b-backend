@@ -1,8 +1,8 @@
-import { Context } from '../context';
+import { Context } from '../context.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
-import type { RegisterInput, LoginInput } from '../types/resolvers';
+import type { RegisterInput, LoginInput } from '../types/resolvers.js';
 
 export const authResolvers = {
   Mutation: {

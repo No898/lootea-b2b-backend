@@ -1,10 +1,10 @@
-import { Context } from '../context';
+import { Context } from '../context.js';
 import { GraphQLError } from 'graphql';
-import { requireAdmin } from '../utils/auth';
+import { requireAdmin } from '../utils/auth.js';
 import type {
   CreateCategoryInput,
   UpdateCategoryInput,
-} from '../types/resolvers';
+} from '../types/resolvers.js';
 
 export const categoryResolvers = {
   Query: {
