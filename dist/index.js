@@ -3,9 +3,9 @@ import { PrismaClient } from '@prisma/client';
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import dotenv from 'dotenv';
-import { typeDefs } from './schema/typeDefs';
-import { resolvers } from './resolvers';
-import { createContext } from './context';
+import { typeDefs } from './schema/typeDefs.js';
+import { resolvers } from './resolvers/index.js';
+import { createContext } from './context.js';
 dotenv.config();
 const prisma = new PrismaClient();
 const fastify = Fastify({
@@ -16,19 +16,48 @@ fastify.get('/health', async () => {
         status: 'ok',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV,
+        services: {
+            database: 'checking...',
+            graphql: 'ok',
+        },
     };
 });
 fastify.get('/db-test', async () => {
     try {
         await prisma.$queryRaw `SELECT 1`;
-        return { database: 'connected' };
+        return {
+            database: 'connected',
+            timestamp: new Date().toISOString(),
+        };
     }
     catch (error) {
+        fastify.log.error('Database connection failed:', error);
         return {
             database: 'error',
             message: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString(),
         };
     }
+});
+fastify.get('/health/detailed', async () => {
+    const result = {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV,
+        services: {
+            graphql: 'ok',
+            database: 'unknown',
+        },
+    };
+    try {
+        await prisma.$queryRaw `SELECT 1`;
+        result.services.database = 'connected';
+    }
+    catch (error) {
+        result.services.database = 'error';
+        result.status = 'degraded';
+    }
+    return result;
 });
 const gracefulShutdown = async () => {
     try {
@@ -49,26 +78,31 @@ const start = async () => {
         if (!process.env.JWT_SECRET) {
             throw new Error('JWT_SECRET environment variable is required');
         }
-        const port = Number(process.env.PORT) || 4000;
+        const port = Number(process.env.PORT) || Number(process.env.REST_PORT) || 3000;
+        const restPort = port;
+        const graphqlPort = port + 1;
         const host = process.env.HOST || '0.0.0.0';
-        await fastify.listen({ port, host });
-        console.log(`🚀 REST API running on http://${host}:${port}`);
-        console.log(`📊 Health check: http://${host}:${port}/health`);
-        console.log(`🗄️  Database test: http://${host}:${port}/db-test`);
-        const apolloServer = new ApolloServer({
+        await fastify.listen({ port: restPort, host });
+        console.log('🔧 REST API server running on http://%s:%d', host, restPort);
+        console.log('📊 Health check: http://%s:%d/health', host, restPort);
+        console.log('📊 Detailed health: http://%s:%d/health/detailed', host, restPort);
+        console.log('🗄️  Database test: http://%s:%d/db-test', host, restPort);
+        const apollo = new ApolloServer({
             typeDefs,
             resolvers,
         });
-        const graphqlPort = port + 1;
-        const { url } = await startStandaloneServer(apolloServer, {
+        const { url } = await startStandaloneServer(apollo, {
             listen: { port: graphqlPort, host },
             context: createContext(prisma),
         });
-        console.log(`🚀 GraphQL server ready at ${url}`);
-        console.log(`🎯 GraphQL Playground: ${url}`);
+        console.log('🚀 GraphQL server ready at:', url);
+        console.log('🎮 GraphQL Playground available at:', url);
+        console.log('\n🎯 Summary:');
+        console.log('   REST API: http://%s:%d', host, restPort);
+        console.log('   GraphQL:  %s', url);
     }
     catch (error) {
-        console.error('Error starting servers:', error);
+        console.error('Error starting server:', error);
         process.exit(1);
     }
 };

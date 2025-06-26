@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 export const createContext = (prisma) => {
-    return ({ request }) => {
-        const token = request.headers.authorization?.replace('Bearer ', '');
+    return async ({ req }) => {
+        const token = req.headers.authorization?.replace('Bearer ', '');
         let user = null;
         if (token) {
             try {
@@ -15,7 +15,6 @@ export const createContext = (prisma) => {
         return {
             prisma,
             user,
-            req: request,
         };
     };
 };

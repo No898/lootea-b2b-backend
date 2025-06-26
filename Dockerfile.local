@@ -1,0 +1,26 @@
+# Stejná Node.js verze jako Railway
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Kopírovat package files
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Instalace závislostí (production only)
+RUN npm ci --omit=dev
+
+# Generování Prisma klienta
+RUN npx prisma generate
+
+# Kopírovat zdrojový kód
+COPY . .
+
+# Build aplikace
+RUN npm run build
+
+# Expose port
+EXPOSE 3000
+
+# Spuštění stejně jako na Railway
+CMD ["npm", "start"] 

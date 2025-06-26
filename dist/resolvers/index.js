@@ -1,6 +1,6 @@
-import { authResolvers } from './auth';
-import { categoryResolvers } from './categories';
-import { productResolvers } from './products';
+import { authResolvers } from './auth.js';
+import { categoryResolvers } from './categories.js';
+import { productResolvers } from './products.js';
 export const resolvers = {
     Query: {
         ...authResolvers.Query,

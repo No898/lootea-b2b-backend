@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { requireAdmin } from '../utils/auth';
+import { requireAdmin } from '../utils/auth.js';
 export const productResolvers = {
     Query: {
         products: async (_, { categoryId, search, limit = 50, offset = 0, }, { prisma }) => {
@@ -29,7 +29,7 @@ export const productResolvers = {
             if (!id && !slug) {
                 throw new GraphQLError('Musíte zadat buď ID nebo slug produktu');
             }
-            const where = id ? { id } : { slug };
+            const where = id ? { id } : { slug: slug };
             return await prisma.product.findUnique({
                 where,
                 include: {
@@ -40,7 +40,7 @@ export const productResolvers = {
     },
     Mutation: {
         createProduct: async (_, { input }, context) => {
-            requireAdmin(context);
+            await requireAdmin(context);
             const existingProduct = await context.prisma.product.findUnique({
                 where: { slug: input.slug },
             });
@@ -64,7 +64,7 @@ export const productResolvers = {
             });
         },
         updateProduct: async (_, { id, input }, context) => {
-            requireAdmin(context);
+            await requireAdmin(context);
             const existingProduct = await context.prisma.product.findUnique({
                 where: { id },
             });
@@ -96,7 +96,7 @@ export const productResolvers = {
             });
         },
         deleteProduct: async (_, { id }, context) => {
-            requireAdmin(context);
+            await requireAdmin(context);
             const product = await context.prisma.product.findUnique({
                 where: { id },
             });

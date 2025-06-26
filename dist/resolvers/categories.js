@@ -1,5 +1,5 @@
 import { GraphQLError } from 'graphql';
-import { requireAdmin } from '../utils/auth';
+import { requireAdmin } from '../utils/auth.js';
 export const categoryResolvers = {
     Query: {
         categories: async (_, __, { prisma }) => {
@@ -18,7 +18,7 @@ export const categoryResolvers = {
             if (!id && !slug) {
                 throw new GraphQLError('Musíte zadat buď ID nebo slug kategorie');
             }
-            const where = id ? { id } : { slug };
+            const where = id ? { id } : { slug: slug };
             return await prisma.category.findUnique({
                 where,
                 include: {
@@ -32,7 +32,7 @@ export const categoryResolvers = {
     },
     Mutation: {
         createCategory: async (_, { input }, context) => {
-            requireAdmin(context);
+            await requireAdmin(context);
             const existing = await context.prisma.category.findFirst({
                 where: {
                     OR: [{ name: input.name }, { slug: input.slug }],
@@ -52,7 +52,7 @@ export const categoryResolvers = {
             });
         },
         updateCategory: async (_, { id, input }, context) => {
-            requireAdmin(context);
+            await requireAdmin(context);
             const existingCategory = await context.prisma.category.findUnique({
                 where: { id },
             });
@@ -90,7 +90,7 @@ export const categoryResolvers = {
             });
         },
         deleteCategory: async (_, { id }, context) => {
-            requireAdmin(context);
+            await requireAdmin(context);
             const category = await context.prisma.category.findUnique({
                 where: { id },
                 include: {
