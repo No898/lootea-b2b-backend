@@ -50,7 +50,7 @@ export const categoryResolvers = {
       { input }: { input: CreateCategoryInput },
       context: Context
     ) => {
-      await requireAdmin(context);
+      requireAdmin(context.user);
 
       // Kontrola, zda už kategorie s tímto názvem nebo slug neexistuje
       const existing = await context.prisma.category.findFirst({
@@ -81,7 +81,7 @@ export const categoryResolvers = {
       { id, input }: { id: string; input: UpdateCategoryInput },
       context: Context
     ) => {
-      await requireAdmin(context);
+      requireAdmin(context.user);
 
       // Kontrola, zda kategorie existuje
       const existingCategory = await context.prisma.category.findUnique({
@@ -136,7 +136,7 @@ export const categoryResolvers = {
       { id }: { id: string },
       context: Context
     ) => {
-      await requireAdmin(context);
+      requireAdmin(context.user);
 
       // Kontrola, zda kategorie existuje
       const category = await context.prisma.category.findUnique({

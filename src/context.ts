@@ -1,39 +1,24 @@
-import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import type { PrismaClient } from '@prisma/client';
+import { extractToken, getUserFromToken, type AuthUser } from './utils/auth.js';
 
-// Typ User se generuje z Prisma schema
-type User = {
-  id: string;
-  email?: string;
-  role?: string;
-};
+// User typ se teď importuje z auth utils
 
 export interface Context {
   prisma: PrismaClient;
-  user?: User | null;
+  user: AuthUser | null;
 }
 
+/**
+ * Vytvoří context pro Apollo Server 4
+ * Automaticky načte uživatele z JWT tokenu
+ */
 export const createContext = (prisma: PrismaClient) => {
   return async ({ req }: { req: any }): Promise<Context> => {
-    // Získání tokenu z headeru
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    // Extrahuj token z Authorization header
+    const token = extractToken(req.headers.authorization);
 
-    let user: User | null = null;
-
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-          userId: string;
-        };
-
-        // V production můžeme user načíst z DB pro fresh data
-        // Pro teď si uložíme jen userId do contextu
-        user = { id: decoded.userId };
-      } catch (error) {
-        // Invalid token, user zůstane null
-        console.warn('Invalid JWT token:', error);
-      }
-    }
+    // Načti uživatele z tokenu (pokud existuje)
+    const user = await getUserFromToken(token, prisma);
 
     return {
       prisma,

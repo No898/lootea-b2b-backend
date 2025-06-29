@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
+import { generateToken } from '../utils/auth.js';
+import { getEmailService, createRegistrationEmailData, } from '../utils/email.js';
 export const authResolvers = {
     Mutation: {
         register: async (_, { input }, { prisma }) => {
@@ -37,7 +38,12 @@ export const authResolvers = {
                     country: input.country || 'Czech Republic',
                 },
             });
-            const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+            const emailService = getEmailService();
+            const emailData = createRegistrationEmailData(user);
+            emailService.sendRegistrationConfirmation(emailData).catch(error => {
+                console.error('❌ Failed to send registration email:', error);
+            });
+            const token = generateToken(user);
             return {
                 token,
                 user,
@@ -63,7 +69,7 @@ export const authResolvers = {
                     extensions: { code: 'ACCOUNT_DISABLED' },
                 });
             }
-            const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+            const token = generateToken(user);
             return {
                 token,
                 user,

@@ -196,6 +196,73 @@ export const typeDefs = `#graphql
     price: Float!
   }
 
+  # Analytics types
+  type UserStats {
+    total: Int!
+    active: Int!
+    inactive: Int!
+  }
+
+  type OrderStats {
+    total: Int!
+    pending: Int!
+    completed: Int!
+  }
+
+  type RevenueStats {
+    total: Float!
+    monthly: Float!
+  }
+
+  type TopProduct {
+    product: Product
+    totalQuantity: Int!
+    orderCount: Int!
+  }
+
+  type Analytics {
+    users: UserStats!
+    orders: OrderStats!
+    revenue: RevenueStats!
+    topProducts: [TopProduct!]!
+    recentOrders: [Order!]!
+  }
+
+  # Bulk operation results
+  type BulkOperationResult {
+    count: Int!
+    success: Boolean!
+  }
+
+  # Bulk custom price input
+  input BulkCustomPriceInput {
+    userId: ID!
+    productId: ID!
+    price: Float!
+  }
+
+  # Payment types
+  type PaymentStatus {
+    transId: String!
+    status: String!
+    price: Float!
+    curr: String!
+    method: String!
+    order: Order!
+  }
+
+  type CreatePaymentResult {
+    success: Boolean!
+    transId: String
+    redirectUrl: String
+    order: Order
+  }
+
+  type CancelPaymentResult {
+    success: Boolean!
+    message: String!
+  }
+
   # Queries
   type Query {
     # Public queries
@@ -210,10 +277,14 @@ export const typeDefs = `#graphql
     order(id: ID!): Order
 
     # Admin queries
-    users: [User!]!
+    users(limit: Int, offset: Int, search: String, isActive: Boolean): [User!]!
     user(id: ID!): User
     orders(status: OrderStatus, limit: Int, offset: Int): [Order!]!
-    customPrices(userId: ID, productId: ID): [CustomPrice!]!
+    customPrices(userId: ID, productId: ID, limit: Int, offset: Int): [CustomPrice!]!
+    analytics: Analytics!
+
+    # Payment queries
+    paymentStatus(transId: String!): PaymentStatus!
   }
 
   # Mutations
@@ -243,6 +314,14 @@ export const typeDefs = `#graphql
 
     # User management (Admin only)
     updateUserStatus(id: ID!, isActive: Boolean!): User!
+    
+    # Bulk operations (Admin only)
+    bulkUpdateUserStatus(userIds: [ID!]!, isActive: Boolean!): BulkOperationResult!
+    bulkSetCustomPrices(prices: [BulkCustomPriceInput!]!): BulkOperationResult!
+
+    # Payment mutations
+    createPayment(orderId: ID!, method: String, returnUrl: String): CreatePaymentResult!
+    cancelPayment(transId: String!): CancelPaymentResult!
   }
 `;
 //# sourceMappingURL=typeDefs.js.map

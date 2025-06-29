@@ -32,7 +32,7 @@ export const categoryResolvers = {
     },
     Mutation: {
         createCategory: async (_, { input }, context) => {
-            await requireAdmin(context);
+            requireAdmin(context.user);
             const existing = await context.prisma.category.findFirst({
                 where: {
                     OR: [{ name: input.name }, { slug: input.slug }],
@@ -52,7 +52,7 @@ export const categoryResolvers = {
             });
         },
         updateCategory: async (_, { id, input }, context) => {
-            await requireAdmin(context);
+            requireAdmin(context.user);
             const existingCategory = await context.prisma.category.findUnique({
                 where: { id },
             });
@@ -90,7 +90,7 @@ export const categoryResolvers = {
             });
         },
         deleteCategory: async (_, { id }, context) => {
-            await requireAdmin(context);
+            requireAdmin(context.user);
             const category = await context.prisma.category.findUnique({
                 where: { id },
                 include: {

@@ -14,11 +14,12 @@ export const typeDefs = `#graphql
     CANCELLED
   }
 
-  enum Unit {
-    KS
-    KG
-    L
-    BAL
+  enum ProductSortKeys {
+    RELEVANCE
+    NEWEST
+    # Note: Sorting by price requires more complex logic now
+    # PRICE_ASC
+    # PRICE_DESC
   }
 
   # Types
@@ -52,28 +53,56 @@ export const typeDefs = `#graphql
     products: [Product!]!
   }
 
+  type Image {
+    id: ID!
+    url: String!
+    altText: String
+  }
+
+  type ProductVariant {
+    id: ID!
+    name: String!
+    slug: String!
+    sku: String!
+    price: Float!
+    discountPrice: Float
+    brand: String
+    flavor: String
+    weightKg: Float
+    volumeL: Float
+    inStock: Boolean!
+    stockQuantity: Int
+    isActive: Boolean!
+    isDefault: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    product: Product!
+    images: [Image!]
+    # Dynamická cena, která zohledňuje slevu a individuální cenu zákazníka
+    currentPrice: Float!
+  }
+
   type Product {
     id: ID!
     name: String!
     slug: String!
     description: String
-    basePrice: Float!
-    unit: Unit!
-    packageSize: Int
-    inStock: Boolean!
     isActive: Boolean!
     sortOrder: Int!
-    category: Category!
     createdAt: String!
     updatedAt: String!
-    # Cena pro přihlášeného uživatele (může být custom price)
-    currentPrice: Float!
+    category: Category!
+    variants: [ProductVariant!]!
+    # Dynamická cena, která bere cenu z defaultní varianty
+    currentPrice: Float
+    # Všechny obrázky ze všech variant
+    images: [Image!]
   }
 
   type CustomPrice {
     id: ID!
     user: User!
-    product: Product!
+    productVariant: ProductVariant!
     price: Float!
     createdAt: String!
     updatedAt: String!
@@ -106,16 +135,39 @@ export const typeDefs = `#graphql
 
   type OrderItem {
     id: ID!
-    product: Product!
+    productVariant: ProductVariant!
     quantity: Int!
     unitPrice: Float!
     total: Float!
+  }
+
+  type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+  }
+
+  type ProductEdge {
+    cursor: String!
+    node: Product!
+  }
+
+  type ProductConnection {
+    totalCount: Int!
+    edges: [ProductEdge!]!
+    pageInfo: PageInfo!
   }
 
   # Auth types
   type AuthPayload {
     token: String!
     user: User!
+  }
+
+  type BatchPayload {
+    count: Int!
+    success: Boolean
   }
 
   # Input types
@@ -152,13 +204,11 @@ export const typeDefs = `#graphql
     sortOrder: Int
   }
 
+  # Product (obal)
   input CreateProductInput {
     name: String!
     slug: String!
     description: String
-    basePrice: Float!
-    unit: Unit!
-    packageSize: Int
     categoryId: ID!
     sortOrder: Int
   }
@@ -167,13 +217,46 @@ export const typeDefs = `#graphql
     name: String
     slug: String
     description: String
-    basePrice: Float
-    unit: Unit
-    packageSize: Int
-    inStock: Boolean
     isActive: Boolean
     categoryId: ID
     sortOrder: Int
+  }
+
+  # Product Variant
+  input ImageInput {
+    url: String!
+    altText: String
+  }
+
+  input CreateProductVariantInput {
+    productId: ID!
+    name: String!
+    slug: String!
+    sku: String!
+    price: Float!
+    discountPrice: Float
+    brand: String
+    flavor: String
+    weightKg: Float
+    volumeL: Float
+    stockQuantity: Int
+    isActive: Boolean
+    isDefault: Boolean
+    images: [ImageInput!]
+  }
+
+  input UpdateProductVariantInput {
+    name: String
+    sku: String
+    price: Float
+    stock: Int
+    isDefault: Boolean
+    attributes: [AttributeInput!]
+  }
+
+  input AttributeInput {
+    name: String!
+    value: String!
   }
 
   input CreateOrderInput {
@@ -186,34 +269,83 @@ export const typeDefs = `#graphql
   }
 
   input OrderItemInput {
-    productId: ID!
+    productVariantId: ID!
     quantity: Int!
   }
 
   input SetCustomPriceInput {
     userId: ID!
-    productId: ID!
+    productVariantId: ID!
     price: Float!
+  }
+
+  # Analytics types
+  type UserStats {
+    total: Int!
+    active: Int!
+    inactive: Int!
+  }
+
+  type OrderStats {
+    total: Int!
+    pending: Int!
+    completed: Int!
+  }
+
+  type RevenueStats {
+    total: Float!
+    monthly: Float!
+  }
+
+  type TopProduct {
+    productVariant: ProductVariant
+    totalQuantity: Int!
+    orderCount: Int!
+  }
+
+  type Analytics {
+    users: UserStats!
+    orders: OrderStats!
+    revenue: RevenueStats!
+    topProducts: [TopProduct!]!
   }
 
   # Queries
   type Query {
-    # Public queries
-    categories: [Category!]!
-    category(id: ID, slug: String): Category
-    products(categoryId: ID, search: String, limit: Int, offset: Int): [Product!]!
-    product(id: ID, slug: String): Product
-
-    # Authenticated queries
+    # Users
     me: User
-    myOrders: [Order!]!
-    order(id: ID!): Order
-
-    # Admin queries
-    users: [User!]!
     user(id: ID!): User
-    orders(status: OrderStatus, limit: Int, offset: Int): [Order!]!
-    customPrices(userId: ID, productId: ID): [CustomPrice!]!
+    users(first: Int, after: String): [User!]
+    
+    # Categories
+    category(id: ID!): Category
+    categories: [Category!]!
+    
+    # Products
+    products(
+      first: Int,
+      after: String,
+      search: String,
+      categoryId: ID,
+      minPrice: Float,
+      maxPrice: Float,
+      sortBy: ProductSortKeys
+    ): ProductConnection!
+    product(id: ID, slug: String): Product
+    productBySlug(slug: String!): Product
+    productVariant(id: ID!): ProductVariant
+    
+    # Orders
+    order(id: ID!): Order
+    orders(
+      userId: ID, 
+      status: OrderStatus, 
+      first: Int, 
+      after: String
+    ): [Order!]
+    
+    # Analytics
+    analytics: Analytics!
   }
 
   # Mutations
@@ -221,27 +353,39 @@ export const typeDefs = `#graphql
     # Auth
     register(input: RegisterInput!): AuthPayload!
     login(input: LoginInput!): AuthPayload!
-
-    # Categories (Admin only)
+    
+    # Category
     createCategory(input: CreateCategoryInput!): Category!
     updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
     deleteCategory(id: ID!): Boolean!
-
-    # Products (Admin only)
+    
+    # Product
     createProduct(input: CreateProductInput!): Product!
     updateProduct(id: ID!, input: UpdateProductInput!): Product!
-    deleteProduct(id: ID!): Boolean!
-
-    # Orders
+    deleteProduct(id: ID!): BatchPayload
+    
+    # Product Variant
+    createProductVariant(input: CreateProductVariantInput!): ProductVariant!
+    updateProductVariant(id: ID!, input: UpdateProductVariantInput!): ProductVariant!
+    deleteProductVariant(id: ID!): BatchPayload
+    
+    # Custom Price
+    setCustomPrice(input: SetCustomPriceInput!): CustomPrice!
+    removeCustomPrice(userId: ID!, productVariantId: ID!): Boolean!
+    
+    # Order
     createOrder(input: CreateOrderInput!): Order!
     updateOrderStatus(id: ID!, status: OrderStatus!): Order!
-    addTrackingNumber(id: ID!, trackingNumber: String!): Order!
+    
+    # Admin mutations
+    updateUserStatus(id: ID!, isActive: Boolean!): User
+    bulkUpdateUserStatus(userIds: [ID!]!, isActive: Boolean!): BatchPayload
+    bulkSetCustomPrices(prices: [CustomPriceInput!]!): BatchPayload
+  }
 
-    # Custom prices (Admin only)
-    setCustomPrice(input: SetCustomPriceInput!): CustomPrice!
-    removeCustomPrice(userId: ID!, productId: ID!): Boolean!
-
-    # User management (Admin only)
-    updateUserStatus(id: ID!, isActive: Boolean!): User!
+  input CustomPriceInput {
+    userId: ID!
+    productVariantId: ID!
+    price: Float!
   }
 `;

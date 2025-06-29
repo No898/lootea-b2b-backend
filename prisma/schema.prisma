@@ -81,53 +81,39 @@ model Category {
 
 // Produkty
 model Product {
-  id          String  @id @default(uuid())
-  name        String
-  slug        String  @unique
+  id          String   @id @default(cuid())
+  name        String // Obecný název, např. "Sirup", "Jelly", "Bubble Tea Prášek"
+  slug        String   @unique
   description String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  // Ceny a jednotky
-  basePrice   Float // Základní cena
-  unit        Unit  @default(KS)
-  packageSize Int? // Kolik kusů v balení (pro BAL)
-
-  // Inventory
-  inStock Boolean @default(true)
-
-  // Kategorie
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
-  // Metadata
-  isActive  Boolean @default(true)
-  sortOrder Int     @default(0)
+  variants ProductVariant[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Vztahy
-  orderItems   OrderItem[]
-  customPrices CustomPrice[]
-
-  @@map("products")
+  @@index([categoryId])
 }
 
 // Individuální ceny pro B2B zákazníky
 model CustomPrice {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
 
   price Float // Speciální cena pro tohoto zákazníka
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, productId])
+  @@unique([userId, productVariantId])
   @@map("custom_prices")
 }
 
@@ -182,12 +168,61 @@ model OrderItem {
   orderId String
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
 
   quantity  Int
   unitPrice Float // Cena za jednotku v době objednávky
   total     Float // quantity * unitPrice
 
   @@map("order_items")
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  url       String
+  altText   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  @@index([productVariantId])
+}
+
+model ProductVariant {
+  id   String  @id @default(cuid())
+  name String // Celý název varianty pro zobrazení, např. "Waitansky Sirup - Borůvka 2.5kg"
+  slug String  @unique
+  sku  String? @unique
+
+  // -- Atributy varianty --
+  brand    String? // např. "Waitansky", "Monin"
+  flavor   String? // např. "Borůvka", "Vanilka"
+  weightKg Float? // Hmotnost v kg, např. 2.5
+  volumeL  Float? // Objem v litrech, např. 0.7
+
+  // -- Ceny a sklad --
+  price         Float
+  discountPrice Float?
+  stockQuantity Int?
+  isActive      Boolean @default(true)
+  inStock       Boolean @default(true)
+  isDefault     Boolean @default(false) // Varianta, která se zobrazí jako výchozí na detailu produktu
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // -- Vztahy --
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  images       Image[]
+  orderItems   OrderItem[]
+  customPrices CustomPrice[]
+
+  // Unikátní může být kombinace produktu a SKU
+  @@unique([productId, sku])
+  @@index([productId])
 }

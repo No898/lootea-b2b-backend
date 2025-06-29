@@ -1,7 +1,11 @@
 import { Context } from '../context.js';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
+import { generateToken } from '../utils/auth.js';
+import {
+  getEmailService,
+  createRegistrationEmailData,
+} from '../utils/email.js';
 import type { RegisterInput, LoginInput } from '../types/resolvers.js';
 
 export const authResolvers = {
@@ -54,12 +58,15 @@ export const authResolvers = {
         },
       });
 
+      // Poslání registračního emailu (asynchronně, neblokuje odpověď)
+      const emailService = getEmailService();
+      const emailData = createRegistrationEmailData(user);
+      emailService.sendRegistrationConfirmation(emailData).catch(error => {
+        console.error('❌ Failed to send registration email:', error);
+      });
+
       // Generování JWT tokenu
-      const token = jwt.sign(
-        { userId: user.id, email: user.email, role: user.role },
-        process.env.JWT_SECRET!,
-        { expiresIn: '7d' }
-      );
+      const token = generateToken(user);
 
       return {
         token,
@@ -100,11 +107,7 @@ export const authResolvers = {
       }
 
       // Generování JWT tokenu
-      const token = jwt.sign(
-        { userId: user.id, email: user.email, role: user.role },
-        process.env.JWT_SECRET!,
-        { expiresIn: '7d' }
-      );
+      const token = generateToken(user);
 
       return {
         token,

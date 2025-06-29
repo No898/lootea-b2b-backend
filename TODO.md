@@ -23,25 +23,25 @@
 ### 🔄 Week 1: Railway setup a databázové modely
 
 #### 🚀 Railway a CI/CD setup (10-12 hodin) - **PRIORITA #1**
-- [ ] **Railway projekt setup**
-  - [ ] Vytvoření Railway účtu a projektu
-  - [ ] GitHub repository propojení
-  - [ ] PostgreSQL databáze provision (production + test)
-  - [ ] Redis addon přidání
-- [ ] **CI/CD pipeline s testy**
-  - [ ] GitHub Actions workflow (.github/workflows/ci.yml)
-  - [ ] Test databáze setup v CI (PostgreSQL service)
-  - [ ] Lint + Format + Test + Deploy pipeline
-  - [ ] Deploy pouze pokud všechny testy prošly
-- [ ] **Environment konfigurace**
-  - [ ] `.env.example` template
-  - [ ] Railway environment variables (DATABASE_URL, REDIS_URL, JWT_SECRET)
-  - [ ] Test environment variables (TEST_DATABASE_URL)
-  - [ ] Environment validation (joi/zod)
-- [ ] **Základní deployment test**
-  - [ ] Minimální Fastify server
-  - [ ] Health check endpoint
-  - [ ] Successful deployment verification
+- [x] **Railway projekt setup**
+  - [x] Vytvoření Railway účtu a projektu
+  - [x] GitHub repository propojení
+  - [x] PostgreSQL databáze provision (production + test)
+  - [x] Redis addon přidání
+- [x] **CI/CD pipeline s testy**
+  - [x] GitHub Actions workflow (.github/workflows/ci.yml)
+  - [x] Test databáze setup v CI (PostgreSQL service)
+  - [x] Lint + Format + Test + Deploy pipeline
+  - [x] Deploy pouze pokud všechny testy prošly
+- [x] **Environment konfigurace**
+  - [x] `.env.example` template
+  - [x] Railway environment variables (DATABASE_URL, REDIS_URL, JWT_SECRET)
+  - [x] Test environment variables (TEST_DATABASE_URL)
+  - [x] Environment validation (joi/zod)
+- [x] **Základní deployment test**
+  - [x] Minimální Fastify server
+  - [x] Health check endpoint
+  - [x] Successful deployment verification
 
 #### 🧪 Testing infrastruktura (8-10 hodin) - **PRIORITA #2**
 - [ ] **Testing setup**
@@ -99,145 +99,155 @@
 
 ### 🔄 Week 2: Základní server infrastruktura
 
-#### 🔄 Fastify + Apollo Server setup (12-16 hodin) - **ČÁSTEČNĚ HOTOVO**
+#### ✅ Fastify + Apollo Server setup (12-16 hodin) - **HOTOVO**
 - [x] **Základní server struktura**
   - [x] `src/index.ts` - entry point s Fastify (TypeScript)
-  - [ ] `src/config/` - konfigurace (database, redis, jwt)
-  - [ ] `src/graphql/` - Apollo Server setup
-  - [ ] `src/utils/` - helper funkce
-- [ ] **Apollo Server integrace**
-  - [ ] Apollo Server 4 setup s Fastify
-  - [ ] GraphQL schema definice (typeDefs)
-  - [ ] Context setup (user z JWT)
-  - [ ] Apollo Studio v development
-- [ ] **Middleware a pluginy**
-  - [ ] JWT authentication middleware
-  - [ ] CORS konfigurace
-  - [ ] Rate limiting (pro GraphQL endpoint)
-  - [ ] Request logging
-  - [ ] Error handling
-- [ ] **Redis integrace**
-  - [ ] Redis client setup
-  - [ ] Session storage
-  - [ ] Cache helper funkce
+  - [x] `src/utils/` - helper funkce (auth, redis, cors, rateLimit)
+  - [x] Apollo Server 4 standalone setup
+- [x] **Apollo Server integrace**
+  - [x] Apollo Server 4 setup standalone
+  - [x] GraphQL schema definice (typeDefs)
+  - [x] Context setup (user z JWT)
+  - [x] Apollo Studio v development
+- [x] **Middleware a pluginy**
+  - [x] JWT authentication middleware
+  - [x] CORS konfigurace
+  - [x] Rate limiting (pro GraphQL endpoint)
+  - [x] Request logging
+  - [x] Error handling
+- [x] **Redis integrace**
+  - [x] Redis client setup
+  - [x] Cache helper funkce
+  - [x] Session storage ready
 - [x] **Health check endpoints**
   - [x] `/health` - základní health check
   - [x] `/db-test` - database connectivity
-  - [ ] `/health/redis` - redis connectivity
+  - [x] `/health/redis` - redis connectivity
+  - [x] `/health/detailed` - kompletní check
 
 ---
 
 ## 🗓️ Fáze 2: GraphQL API a autentizace (Týden 3-4)
 
-### 🔄 Week 3: GraphQL schema a základní resolvers
+### ✅ Week 3: GraphQL schema a základní resolvers - **HOTOVO**
 
-#### 📝 GraphQL schema definice (16-20 hodin)
-- [ ] **GraphQL typy podle dokumentace**
-  - [ ] User, Customer, Admin typy
-  - [ ] Product, Category, CustomerPrice typy
-  - [ ] Order, OrderItem, OrderStatus typy
-  - [ ] Input typy pro mutations
-  - [ ] Enum typy (Role, OrderStatus, Category, Unit)
-- [ ] **Query resolvers**
-  - [ ] `products` - s filtry (kategorie, search, cena)
-  - [ ] `product(id)` - detail produktu
-  - [ ] `categories` - hierarchie kategorií
-  - [ ] `me` - současný uživatel
-  - [ ] `orders` - objednávky uživatele
-  - [ ] `order(id)` - detail objednávky
-- [ ] **Admin queries**
-  - [ ] `allUsers` - správa zákazníků
-  - [ ] `allOrders` - všechny objednávky
-  - [ ] `analytics` - základní statistiky
-- [ ] **Apollo Server integrace**
-  - [ ] Apollo Server setup s Fastify
-  - [ ] GraphQL Playground/Apollo Studio setup
-  - [ ] Schema definice a resolvers
-  - [ ] Context setup (user authentication)
+#### ✅ GraphQL schema definice (16-20 hodin) - **HOTOVO**
+- [x] **GraphQL typy podle dokumentace**
+  - [x] User, Customer, Admin typy
+  - [x] Product, Category, CustomerPrice typy
+  - [x] Order, OrderItem, OrderStatus typy
+  - [x] Input typy pro mutations
+  - [x] Enum typy (Role, OrderStatus, Category, Unit)
+  - [x] Analytics typy (UserStats, OrderStats, RevenueStats)
+  - [x] Bulk operation typy
+- [x] **Query resolvers**
+  - [x] `products` - s filtry (kategorie, search, pagination)
+  - [x] `product(id)` - detail produktu s custom pricing
+  - [x] `categories` - hierarchie kategorií
+  - [x] `me` - současný uživatel
+  - [x] `myOrders` - objednávky uživatele
+  - [x] `order(id)` - detail objednávky s authorization
+- [x] **Admin queries**
+  - [x] `users` - správa zákazníků s search a filtering
+  - [x] `orders` - všechny objednávky s filtering
+  - [x] `customPrices` - správa individuálních cen
+  - [x] `analytics` - kompletní dashboard statistiky
+- [x] **Apollo Server integrace**
+  - [x] Apollo Server setup standalone
+  - [x] GraphQL Playground/Apollo Studio setup
+  - [x] Schema definice a resolvers
+  - [x] Context setup (user authentication)
 
-#### 🔐 Autentizace a autorizace (12-16 hodin)
-- [ ] **JWT implementace**
-  - [ ] Token generování a validace
-  - [ ] Refresh token mechanismus
-  - [ ] Context injection (currentUser)
-- [ ] **Auth mutations**
-  - [ ] `register` - registrace B2B zákazníka
-  - [ ] `login` - přihlášení
-  - [ ] `refreshToken` - obnovení tokenu
-  - [ ] `requestPasswordReset` - reset hesla
-  - [ ] `resetPassword` - potvrzení reset hesla
-- [ ] **Authorization guards**
-  - [ ] Role-based access control
-  - [ ] Resource ownership validation
-  - [ ] Admin-only operations
+#### ✅ Autentizace a autorizace (12-16 hodin) - **HOTOVO**
+- [x] **JWT implementace**
+  - [x] Token generování a validace
+  - [x] Context injection (currentUser)
+  - [ ] Refresh token mechanismus - pro později
+- [x] **Auth mutations**
+  - [x] `register` - registrace B2B zákazníka
+  - [x] `login` - přihlášení
+  - [ ] `refreshToken` - obnovení tokenu - pro později
+  - [ ] `requestPasswordReset` - reset hesla - pro později
+  - [ ] `resetPassword` - potvrzení reset hesla - pro později
+- [x] **Authorization guards**
+  - [x] Role-based access control (requireAuth, requireAdmin)
+  - [x] Resource ownership validation
+  - [x] Admin-only operations
 
-### 🔄 Week 4: Business logic a mutations
+### ✅ Week 4: Business logic a mutations - **HOTOVO**
 
-#### 🛒 E-commerce mutations (16-20 hodin)
-- [ ] **Product management (Admin)**
-  - [ ] `createProduct` - vytvoření produktu
-  - [ ] `updateProduct` - úprava produktu
-  - [ ] `deleteProduct` - smazání produktu
-  - [ ] `setCustomerPrice` - individuální cena
-- [ ] **Order management**
-  - [ ] `createOrder` - vytvoření objednávky
-  - [ ] `updateOrderStatus` - změna stavu (Admin)
-  - [ ] `cancelOrder` - zrušení objednávky
-  - [ ] `addOrderItem` - přidání položky
-  - [ ] `removeOrderItem` - odebrání položky
-- [ ] **User management**
-  - [ ] `updateProfile` - úprava profilu
-  - [ ] `approveCustomer` - schválení zákazníka (Admin)
-  - [ ] `blockCustomer` - blokování zákazníka (Admin)
+#### ✅ E-commerce mutations (16-20 hodin) - **HOTOVO**
+- [x] **Product management (Admin)**
+  - [x] `createProduct` - vytvoření produktu
+  - [x] `updateProduct` - úprava produktu
+  - [x] `deleteProduct` - smazání produktu
+  - [x] `setCustomPrice` - individuální cena
+  - [x] `removeCustomPrice` - odebrání individuální ceny
+- [x] **Order management**
+  - [x] `createOrder` - vytvoření objednávky s business logikou
+  - [x] `updateOrderStatus` - změna stavu s validací (Admin)
+  - [x] `addTrackingNumber` - přidání tracking čísla
+  - [ ] `cancelOrder` - zrušení objednávky - zatím přes updateOrderStatus
+- [x] **User management**
+  - [x] `updateUserStatus` - aktivace/deaktivace zákazníka (Admin)
+  - [x] `bulkUpdateUserStatus` - hromadné operace
+  - [x] `bulkSetCustomPrices` - hromadné nastavení cen
+  - [ ] `updateProfile` - úprava profilu - pro později
 
-#### 🔍 Advanced features (8-12 hodin)
-- [ ] **Search a filtering**
-  - [ ] Full-text search v produktech
-  - [ ] Pokročilé filtry (cena, kategorie, dostupnost)
-  - [ ] Sorting options
-- [ ] **Caching strategie**
-  - [ ] Redis cache pro produkty
-  - [ ] Cache invalidation
-  - [ ] Performance optimalizace
+#### ✅ Advanced features (8-12 hodin) - **HOTOVO**
+- [x] **Search a filtering**
+  - [x] Search v produktech (název, popis)
+  - [x] Filtry (kategorie, dostupnost, aktivní)
+  - [x] Pagination (limit, offset)
+  - [x] Sorting options
+- [x] **Caching strategie**
+  - [x] Redis cache pro analytics
+  - [x] Cache invalidation patterns
+  - [x] Performance optimalizace s cache
 
 ---
 
-## 🗓️ Fáze 3: Platby a email systém (Týden 5)
+## ✅ Fáze 3: Platby a email systém (Týden 5) - **HOTOVO**
 
-### 💳 Comgate V2 integrace (20-24 hodin)
-- [ ] **Comgate API client**
-  - [ ] REST API wrapper
-  - [ ] Authentication (API key)
-  - [ ] Error handling a retry logic
-- [ ] **Payment flow**
-  - [ ] `createPayment` - inicializace platby
-  - [ ] Payment redirect URL generování
-  - [ ] Webhook endpoint pro status updates
-  - [ ] Payment verification
-- [ ] **Order synchronizace**
-  - [ ] Automatická změna stavu při úspěšné platbě
-  - [ ] Handling failed payments
-  - [ ] Refund support (základní)
-- [ ] **Testing a validation**
-  - [ ] Sandbox environment setup
-  - [ ] Test payment scenarios
-  - [ ] Webhook security validation
+### ✅ Comgate V2 integrace (20-24 hodin) - **HOTOVO**
+- [x] **Comgate API client**
+  - [x] REST API wrapper s Axios
+  - [x] Authentication (merchant + secret hash)
+  - [x] Error handling a retry logic
+  - [x] TypeScript types pro všechny API calls
+- [x] **Payment flow**
+  - [x] `createPayment` - inicializace platby s business logikou
+  - [x] Payment redirect URL generování
+  - [x] Webhook endpoint pro status updates (/webhooks/comgate)
+  - [x] Payment verification s signature checking
+- [x] **Order synchronizace**
+  - [x] Automatická změna stavu při úspěšné platbě
+  - [x] Handling failed payments (CANCELLED status)
+  - [x] Payment ID tracking v objednávkách
+  - [x] Admin cancel payment funkce
+- [x] **GraphQL mutations**
+  - [x] `createPayment` - vytvoření platby pro objednávku
+  - [x] `paymentStatus` - získání stavu platby
+  - [x] `cancelPayment` - zrušení platby (admin)
 
-### 📧 Email systém (12-16 hodin)
-- [ ] **Nodemailer setup**
-  - [ ] SMTP konfigurace
-  - [ ] Email templates engine (handlebars)
-  - [ ] Attachment support
-- [ ] **Email templates**
-  - [ ] Registrace potvrzení
-  - [ ] Order confirmation
-  - [ ] Payment confirmation
-  - [ ] Shipping notification
-  - [ ] Delivery confirmation
-- [ ] **Email queue system**
-  - [ ] Background job processing
-  - [ ] Retry mechanism
-  - [ ] Email delivery tracking
+### ✅ Email systém (12-16 hodin) - **HOTOVO**
+- [x] **Nodemailer setup**
+  - [x] SMTP konfigurace s environment variables
+  - [x] Email templates engine (Handlebars)
+  - [x] Mock transporter pro development
+  - [x] Czech localization (formatPrice, formatDate)
+- [x] **Email templates**
+  - [x] Registrace potvrzení
+  - [x] Order confirmation (profesionální HTML template)
+  - [x] Payment confirmation
+  - [x] Order shipped notification
+  - [x] Order delivered notification
+  - [x] Order cancelled notification
+- [x] **Integration s business logikou**
+  - [x] Automatic email při registraci
+  - [x] Automatic email při vytvoření objednávky
+  - [x] Automatic email při změně stavu platby (webhook)
+  - [x] Email health check v /health/detailed
 
 ---
 
